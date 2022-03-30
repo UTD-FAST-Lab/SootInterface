@@ -11,7 +11,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         String output = "callgraph.tsv";
-        ArrayList<String> args_as_list = new ArrayList<String>(Arrays.asList(args));
+        ArrayList<String> args_as_list = new ArrayList<>(Arrays.asList(args));
         if (args_as_list.contains("--callgraph-output")) {
             int index = args_as_list.indexOf("--callgraph-output");
             output = args_as_list.get(index + 1);
@@ -22,6 +22,7 @@ public class Main {
         PackManager.v().getPack("wjtp").add(
                 new Transform("wjtp.print-callgraph", new CallgraphPrinter(output))
         );
+        System.err.println("Args is " + List.of(args));
         soot.Main.main(args);
     }
 }

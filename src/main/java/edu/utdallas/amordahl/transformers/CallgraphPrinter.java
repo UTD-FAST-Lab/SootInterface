@@ -14,8 +14,11 @@ import java.util.function.Consumer;
 public class CallgraphPrinter extends SceneTransformer {
     private final String output;
 
-    public CallgraphPrinter(String output) {
+    private final boolean srcLineNumbers;
+
+    public CallgraphPrinter(String output, boolean srcLineNumbers) {
         this.output = output;
+        this.srcLineNumbers = srcLineNumbers;
     }
     protected void internalTransform(String s, Map<String, String> map) {
         try {
@@ -25,11 +28,14 @@ public class CallgraphPrinter extends SceneTransformer {
                 try {
                     fw.write(String.format("%s\t%s\t%s\t%s\t%s\n",
                         edge.src(),
-                        edge.srcUnit(),
+                        this.srcLineNumbers ?
+                                String.format("%s:%d", edge.src().method().getDeclaringClass().toString().replace(".","/"),
+                                        edge.srcUnit().getJavaSourceStartLineNumber()) :
+                                edge.srcUnit().toString(),
                         edge.src().context(),
                         edge.tgt().method(),
                         edge.tgt().context()));
-                } catch (IOException e) {
+                } catch (IOException | NullPointerException e) {
                     e.printStackTrace();
                 }
             });

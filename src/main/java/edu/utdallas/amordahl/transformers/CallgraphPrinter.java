@@ -53,6 +53,9 @@ public class CallgraphPrinter extends SceneTransformer {
     }
 
     private String getMethodCall(Edge edge) {
+        if (edge.srcUnit() == null) {
+            return "";
+        }
         if (edge.srcUnit() instanceof JInvokeStmt) {
             JInvokeStmt jis = (JInvokeStmt) edge.srcUnit();
             return String.format("%s.%s", jis.getInvokeExpr().getMethod().getDeclaringClass().toString(),

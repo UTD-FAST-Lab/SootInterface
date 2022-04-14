@@ -42,7 +42,6 @@ public class CallgraphPrinter extends SceneTransformer {
                         edge.tgt().method(),
                         edge.tgt().context()));
                 } catch (IOException | NullPointerException e) {
-                    e.printStackTrace();
                     System.err.println("Could not process edge " + edge.toString());
                 }
             });

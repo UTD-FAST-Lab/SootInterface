@@ -19,12 +19,10 @@ import java.util.function.Consumer;
 public class CallgraphPrinter extends SceneTransformer {
     private final String output;
 
-    private final boolean srcLineNumbers;
-
-    public CallgraphPrinter(String output, boolean srcLineNumbers) {
+    public CallgraphPrinter(String output) {
         this.output = output;
-        this.srcLineNumbers = srcLineNumbers;
     }
+
     protected void internalTransform(String s, Map<String, String> map) {
         try {
             FileWriter fw = new FileWriter(this.output);
@@ -32,19 +30,19 @@ public class CallgraphPrinter extends SceneTransformer {
             Scene.v().getCallGraph().forEach(edge -> {
                 try {
                     fw.write(String.format("%s\t%s\t%s\t%s\t%s\n",
-                        edge.src(),
-                        String.format("<%s: %s>/%s/%s", edge.src().getDeclaringClass(), edge.src().toString(), getMethodCall(edge), 3),
-                        this.srcLineNumbers ?
-                                String.format("%s:%d", edge.src().method().getDeclaringClass().toString().replace(".","/"),
-                                        edge.srcUnit().getJavaSourceStartLineNumber()) :
-                                edge.srcUnit().toString(),
-                        edge.src().context(),
-                        edge.tgt().method(),
-                        edge.tgt().context()));
+                            edge.src(),
+                            String.format("%s (%s:%d)",
+                                    edge.srcUnit().toString(),
+                                    edge.src().method().getDeclaringClass().toString().replace(".", "/"),
+                                    edge.srcUnit().getJavaSourceStartLineNumber()),
+                            edge.src().context(),
+                            edge.tgt().method(),
+                            edge.tgt().context()));
                 } catch (IOException | NullPointerException e) {
                     System.err.println("Could not process edge " + edge.toString());
                 }
             });
+            System.out.println("Wrote callgraph to " + this.output);
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,10 +61,9 @@ public class CallgraphPrinter extends SceneTransformer {
             JAssignStmt jas = (JAssignStmt) edge.srcUnit();
             if (jas.getRightOp() instanceof JStaticInvokeExpr) {
                 return String.format("%s.%s",
-                        ((JStaticInvokeExpr)jas.getRightOp()).getMethod().getDeclaringClass().toString(),
-                        ((JStaticInvokeExpr)jas.getRightOp()).getMethod().getName());
-            }
-            else {
+                        ((JStaticInvokeExpr) jas.getRightOp()).getMethod().getDeclaringClass().toString(),
+                        ((JStaticInvokeExpr) jas.getRightOp()).getMethod().getName());
+            } else {
                 return jas.getRightOpBox().getValue().toString();
             }
         } else {

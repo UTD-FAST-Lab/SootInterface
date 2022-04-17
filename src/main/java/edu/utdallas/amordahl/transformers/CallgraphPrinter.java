@@ -26,7 +26,6 @@ public class CallgraphPrinter extends SceneTransformer {
     protected void internalTransform(String s, Map<String, String> map) {
         try {
             FileWriter fw = new FileWriter(this.output);
-            fw.write("caller\tcallsite\tcaller_context\ttarget\ttarget_context\n");
             Scene.v().getCallGraph().forEach(edge -> {
                 try {
                     fw.write(String.format("%s\t%s\t%s\t%s\t%s\n",

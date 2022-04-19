@@ -30,7 +30,6 @@ public class CallgraphPrinter extends SceneTransformer {
                 try {
                     fw.write(String.format("%s\t%s\t%s\t%s\t%s",
                             edge.src(),
-                            edge.srcUnit().toString(),
                             String.format("%s (%s:%d)",
                                     edge.srcUnit().toString(),
                                     edge.src().method().getDeclaringClass().toString().replace(".", "/"),

@@ -31,7 +31,7 @@ public class Main {
         PackManager.v().getPack("wjtp").add(
                 new Transform("wjtp.print-callgraph", new CallgraphPrinter(output))
         );
-        System.err.println("Args is " + List.of(args));
+        //System.err.println("Args is " + List.of(args));
         ExecutorService service = Executors.newSingleThreadExecutor();
         String[] finalArgs = args;
         Future task = service.submit(new Runnable() {

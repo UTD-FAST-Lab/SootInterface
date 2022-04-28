@@ -28,15 +28,7 @@ public class CallgraphPrinter extends SceneTransformer {
             FileWriter fw = new FileWriter(this.output);
             Scene.v().getCallGraph().forEach(edge -> {
                 try {
-                    fw.write(String.format("%s\t%s\t%s\t%s\t%s",
-                            edge.src(),
-                            String.format("%s (%s:%d)",
-                                    edge.srcUnit().toString(),
-                                    edge.src().method().getDeclaringClass().toString().replace(".", "/"),
-                                    edge.srcUnit().getJavaSourceStartLineNumber()),
-                            edge.src().context(),
-                            edge.tgt().method(),
-                            edge.tgt().context()).replace("\n", "") + "\n");
+                    fw.write(edge.toString() + "\n");
                 } catch (IOException | NullPointerException e) {
                     System.err.println("Could not process edge " + edge.toString());
                 }

@@ -30,10 +30,10 @@ public class CallgraphPrinter extends SceneTransformer {
                 try {
                     fw.write(String.format("%s\t%s\t%s\t%s\t%s",
                             edge.src() == null ? "null" : edge.src().toString(),
-                            edge.srcUnit() == null? "null" : edge.srcUnit().toString(),
-                            edge.src() == null ? "null": edge.src().context().toString(),
+                            edge.srcUnit() == null ? "null" : edge.srcUnit().toString(),
+                            edge.src().context() == null ? "null": edge.src().context().toString(),
                             edge.tgt() == null ? "null": edge.tgt().toString(),
-                            edge.tgt() == null ? "null": edge.tgt().context()).replace("\n", "") + "\n");
+                            edge.tgt().context() == null ? "null": edge.tgt().context()).replace("\n", "") + "\n");
                 } catch (IOException | NullPointerException e) {
                     System.err.println("Could not process edge " + edge.toString());
                 }

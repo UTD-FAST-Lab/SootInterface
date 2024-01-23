@@ -11,10 +11,16 @@ import soot.jimple.spark.geom.dataRep.CgEdge;
 import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.jimple.toolkits.callgraph.Edge;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CallgraphPrinter extends SceneTransformer {
     private final String output;
@@ -24,23 +30,43 @@ public class CallgraphPrinter extends SceneTransformer {
     }
 
     protected void internalTransform(String s, Map<String, String> map) {
+        Map<String, List<String>> keyValuesMap = new HashMap<>();
+
+        Scene.v().getCallGraph().forEach(edge -> {
+            try {
+                addValue(keyValuesMap, edge.getSrc().toString(), edge.getTgt().toString());
+//                System.out.println(edge.getSrc());
+//                System.out.println(edge.getTgt());
+            } catch (NullPointerException e) {
+                System.err.println("Could not process edge " + edge.toString());
+            }
+        });
+
+        convertHashMapToJson(keyValuesMap, this.output);
+        System.out.println("Wrote callgraph to " + this.output);
+    }
+
+    private static void addValue(Map<String, List<String>> map, String key, String value) {
+        // If the key is not present, create a new list
+        map.putIfAbsent(key, new ArrayList<>());
+        // Add the value to the list associated with the key
+        map.get(key).add(value);
+    }
+
+    private static void convertHashMapToJson(Map<String, List<String>> map, String output) {
         try {
-            FileWriter fw = new FileWriter(this.output);
-            Scene.v().getCallGraph().forEach(edge -> {
-                try {
-                    fw.write(String.format("%s\t%s\t%s\t%s\t%s",
-                            edge.src() == null ? "null" : edge.src().toString(),
-                            edge.srcUnit() == null ? "null" : edge.srcUnit().toString(),
-                            edge.src().context() == null ? "null": edge.src().context().toString(),
-                            edge.tgt() == null ? "null": edge.tgt().toString(),
-                            edge.tgt().context() == null ? "null": edge.tgt().context()).replace("\n", "") + "\n");
-                } catch (IOException | NullPointerException e) {
-                    System.err.println("Could not process edge " + edge.toString());
-                }
-            });
-            System.out.println("Wrote callgraph to " + this.output);
-            fw.close();
+            // Create an ObjectMapper
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Convert the HashMap to JSON string
+            String jsonString = objectMapper.writeValueAsString(map);
+
+            // Convert JSON string to a JSON object (JsonNode)
+            Object jsonNode = objectMapper.readValue(jsonString, Object.class);
+            objectMapper.writeValue(new File(output), jsonNode);
+
         } catch (IOException e) {
+            // Handle exception if necessary
             e.printStackTrace();
         }
     }

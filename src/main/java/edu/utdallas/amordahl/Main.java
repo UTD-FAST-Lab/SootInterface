@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 
 public class Main {
     public static void main(String[] args) {
-        String output = "callgraph.tsv";
+        String output = "callgraph.json";
         ArrayList<String> args_as_list = new ArrayList<>(Arrays.asList(args));
         if (args_as_list.contains("--callgraph-output")) {
             int index = args_as_list.indexOf("--callgraph-output");

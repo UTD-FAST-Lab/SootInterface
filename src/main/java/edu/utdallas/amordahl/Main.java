@@ -2,6 +2,7 @@ package edu.utdallas.amordahl;
 
 import soot.PackManager;
 import soot.Transform;
+import soot.options.Options;
 import edu.utdallas.amordahl.transformers.CallgraphPrinter;
 
 import java.util.ArrayList;
@@ -28,6 +29,11 @@ public class Main {
             args_as_list.remove(index);
             args = args_as_list.toArray(new String[] {});
         }
+
+        Options.v().set_keep_line_number(true);
+        Options.v().set_keep_offset(true);
+        Options.v().setPhaseOption("jb", "use-original-names:true");
+        
         PackManager.v().getPack("wjtp").add(
                 new Transform("wjtp.print-callgraph", new CallgraphPrinter(output))
         );

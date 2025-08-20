@@ -30,14 +30,9 @@ public class Main {
             args = args_as_list.toArray(new String[] {});
         }
 
-        // Options.v().set_keep_line_number(true);
-        // Options.v().set_keep_offset(true);
-        // Options.v().setPhaseOption("jb", "use-original-names:true");
-        args_as_list.add("-keep-line-number");
-        args_as_list.add("-keep-offset");
-        args_as_list.add("-p");
-        args_as_list.add("jb");
-        args_as_list.add("use-original-names:true");
+        Options.v().set_keep_line_number(true);
+        Options.v().set_keep_offset(true);
+        Options.v().setPhaseOption("jb", "use-original-names:true");
 
         PackManager.v().getPack("wjtp").add(
                 new Transform("wjtp.print-callgraph", new CallgraphPrinter(output))

@@ -61,6 +61,8 @@ public class CallgraphPrinter extends SceneTransformer {
                 CallSiteInfo callSite = new CallSiteInfo(tgtMethodstr);
 
                 Unit srcUnit = edge.srcUnit();
+                String trg = edge.tgtCtxt().toString();
+                System.out.println("DEBUG:  is " + trg );
                 if (srcUnit != null) {
                     // Get the line number tag
                     LineNumberTag lnTag = (LineNumberTag) srcUnit.getTag("LineNumberTag");
@@ -74,7 +76,7 @@ public class CallgraphPrinter extends SceneTransformer {
                         callSite.bytecodeOffset = bcTag.getBytecodeOffset();
                     }
                     else{
-                        System.err.println("DEBUG: No BytecodeOffsetTag found for " + srcUnit);
+                        // System.err.println("DEBUG: No BytecodeOffsetTag found for " + srcUnit);
                     }
                 }
 

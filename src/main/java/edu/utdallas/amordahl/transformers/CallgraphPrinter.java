@@ -10,6 +10,10 @@ import soot.jimple.internal.JStaticInvokeExpr;
 import soot.jimple.spark.geom.dataRep.CgEdge;
 import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.jimple.toolkits.callgraph.Edge;
+import soot.Unit;
+import soot.tagkit.BytecodeOffsetTag;
+import soot.tagkit.LineNumberTag;
+import soot.tagkit.Tag;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,14 +33,47 @@ public class CallgraphPrinter extends SceneTransformer {
         this.output = output;
     }
 
-    protected void internalTransform(String s, Map<String, String> map) {
-        Map<String, List<String>> keyValuesMap = new HashMap<>();
+    public static class CallSiteInfo {
+        public String targetMethod;
+        public int lineNumber = -1;
+        public int bytecodeOffset = -1;
 
-        Scene.v().getCallGraph().forEach(edge -> {
+        public CallSiteInfo(String targetMethod) {
+            this.targetMethod = targetMethod;
+        }
+    }
+
+    protected void internalTransform(String s, Map<String, String> map) {
+        // Use the new CallSiteInfo class for structured data
+        Map<String, List<CallSiteInfo>> keyValuesMap = new HashMap<>();
+
+        CallGraph cg = Scene.v().getCallGraph();
+        cg.forEach(edge -> {
             try {
-                addValue(keyValuesMap, edge.getSrc().toString(), edge.getTgt().toString());
-//                System.out.println(edge.getSrc());
-//                System.out.println(edge.getTgt());
+                String srcMethod = edge.getSrc().toString();
+                String tgtMethod = edge.getTgt().toString();
+
+                // Create a new info object for this call site
+                CallSiteInfo callSite = new CallSiteInfo(tgtMethod);
+
+                Unit srcUnit = edge.srcUnit();
+                if (srcUnit != null) {
+                    // Get the line number tag
+                    LineNumberTag lnTag = (LineNumberTag) srcUnit.getTag("LineNumberTag");
+                    if (lnTag != null) {
+                        callSite.lineNumber = lnTag.getLineNumber();
+                    }
+
+                    // Get the bytecode offset tag (this is the PC)
+                    BytecodeOffsetTag bcTag = (BytecodeOffsetTag) srcUnit.getTag("BytecodeOffsetTag");
+                    if (bcTag != null) {
+                        callSite.bytecodeOffset = bcTag.getBytecodeOffset();
+                    }
+                }
+
+                // Add the structured information to the map
+                keyValuesMap.computeIfAbsent(srcMethod, k -> new ArrayList<>()).add(callSite);
+
             } catch (NullPointerException e) {
                 System.err.println("Could not process edge " + edge.toString());
             }
@@ -53,7 +90,7 @@ public class CallgraphPrinter extends SceneTransformer {
         map.get(key).add(value);
     }
 
-    private static void convertHashMapToJson(Map<String, List<String>> map, String output) {
+    private static void convertHashMapToJson(Map<String, List<CallSiteInfo>> map, String output) {
         try {
             // Create an ObjectMapper
             ObjectMapper objectMapper = new ObjectMapper();

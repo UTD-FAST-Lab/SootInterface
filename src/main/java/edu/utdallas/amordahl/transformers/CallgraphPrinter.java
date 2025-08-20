@@ -81,11 +81,11 @@ public class CallgraphPrinter extends SceneTransformer {
             }
             // --- END OF EXPERIMENT ---
             try {
-                String srcMethod = edge.getSrc().toString();
-                String tgtMethod = edge.getTgt().toString();
+                String srcMethodstr = edge.getSrc().toString();
+                String tgtMethodstr = edge.getTgt().toString();
 
                 // Create a new info object for this call site
-                CallSiteInfo callSite = new CallSiteInfo(tgtMethod);
+                CallSiteInfo callSite = new CallSiteInfo(tgtMethodstr);
 
                 Unit srcUnit = edge.srcUnit();
                 if (srcUnit != null) {
@@ -103,7 +103,7 @@ public class CallgraphPrinter extends SceneTransformer {
                 }
 
                 // Add the structured information to the map
-                keyValuesMap.computeIfAbsent(srcMethod, k -> new ArrayList<>()).add(callSite);
+                keyValuesMap.computeIfAbsent(srcMethodstr, k -> new ArrayList<>()).add(callSite);
 
             } catch (NullPointerException e) {
                 System.err.println("Could not process edge " + edge.toString());

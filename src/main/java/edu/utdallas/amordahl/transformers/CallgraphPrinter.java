@@ -61,8 +61,6 @@ public class CallgraphPrinter extends SceneTransformer {
                 CallSiteInfo callSite = new CallSiteInfo(tgtMethodstr);
 
                 Unit srcUnit = edge.srcUnit();
-                String trg = edge.tgtCtxt().toString();
-                System.out.println("DEBUG:  is " + trg );
                 if (srcUnit != null) {
                     // Get the line number tag
                     LineNumberTag lnTag = (LineNumberTag) srcUnit.getTag("LineNumberTag");

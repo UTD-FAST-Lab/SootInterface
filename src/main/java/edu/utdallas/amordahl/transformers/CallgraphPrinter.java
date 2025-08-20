@@ -14,6 +14,8 @@ import soot.Unit;
 import soot.tagkit.BytecodeOffsetTag;
 import soot.tagkit.LineNumberTag;
 import soot.tagkit.Tag;
+import soot.options.Options; 
+
 
 import java.io.File;
 import java.io.FileWriter;
@@ -45,6 +47,7 @@ public class CallgraphPrinter extends SceneTransformer {
 
     protected void internalTransform(String s, Map<String, String> map) {
         // Use the new CallSiteInfo class for structured data
+        System.err.println("DEBUG: Is keep_offset enabled? " + Options.v().keep_offset());
         Map<String, List<CallSiteInfo>> keyValuesMap = new HashMap<>();
 
         CallGraph cg = Scene.v().getCallGraph();

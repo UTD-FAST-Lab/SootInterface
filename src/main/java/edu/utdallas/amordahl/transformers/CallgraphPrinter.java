@@ -51,39 +51,12 @@ public class CallgraphPrinter extends SceneTransformer {
         System.err.println("DEBUG: Is keep_offset enabled? " + Options.v().keep_offset());
         Map<String, List<CallSiteInfo>> keyValuesMap = new HashMap<>();
 
-        // We will collect all methods we've already scanned to avoid redundant printing
-        Set<SootMethod> scannedMethods = new HashSet<>();
 
         CallGraph cg = Scene.v().getCallGraph();
         cg.forEach(edge -> {
-            SootMethod srcMethod = edge.getSrc();
-
-            // --- START OF EXPERIMENT ---
-            // Only scan each method once.
-            if (!scannedMethods.contains(srcMethod)) {
-                System.out.println("\nScanning method: " + srcMethod.getSignature());
-                if (srcMethod.hasActiveBody()) {
-                    boolean foundAnyOffset = false;
-                    for (Unit unit : srcMethod.getActiveBody().getUnits()) {
-                        BytecodeOffsetTag bcTag = (BytecodeOffsetTag) unit.getTag("BytecodeOffsetTag");
-                        if (bcTag != null) {
-                            System.out.println("  -> Found offset " + bcTag.getBytecodeOffset() + " on unit: " + unit);
-                            foundAnyOffset = true;
-                        }
-                    }
-                    if (!foundAnyOffset) {
-                        System.out.println("  -> No BytecodeOffsetTags found in this method's body.");
-                    }
-                } else {
-                    System.out.println("  -> Method has no active body.");
-                }
-                scannedMethods.add(srcMethod);
-            }
-            // --- END OF EXPERIMENT ---
             try {
                 String srcMethodstr = edge.getSrc().toString();
-                String tgtMethodstr = edge.getTgt().toString();
-
+                String tgtMethodstr = edge.getTgt().toString();         
                 // Create a new info object for this call site
                 CallSiteInfo callSite = new CallSiteInfo(tgtMethodstr);
 
@@ -99,6 +72,9 @@ public class CallgraphPrinter extends SceneTransformer {
                     BytecodeOffsetTag bcTag = (BytecodeOffsetTag) srcUnit.getTag("BytecodeOffsetTag");
                     if (bcTag != null) {
                         callSite.bytecodeOffset = bcTag.getBytecodeOffset();
+                    }
+                    else{
+                        System.err.println("DEBUG: No BytecodeOffsetTag found for " + srcUnit);
                     }
                 }
 

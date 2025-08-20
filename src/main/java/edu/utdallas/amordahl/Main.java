@@ -30,6 +30,7 @@ public class Main {
             args = args_as_list.toArray(new String[] {});
         }
 
+        Options.v().set_src_prec(Options.src_prec_class);  // force class file as input
         Options.v().set_keep_line_number(true);
         Options.v().set_keep_offset(true);
         Options.v().setPhaseOption("jb", "use-original-names:true");
